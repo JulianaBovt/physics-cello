@@ -1,282 +1,252 @@
-// DOM ЭЛЕМЕНТЫ
-const lengthInput = document.getElementById('lengthInput');
-const tensionInput = document.getElementById('tensionInput');
-const densityInput = document.getElementById('densityInput');
-const diameterInput = document.getElementById('diameterInput');
-
-const frequencyOutput = document.getElementById('frequencyOutput');
-const speedOutput = document.getElementById('speedOutput');
-const wavelengthOutput = document.getElementById('wavelengthOutput');
-
-const scaleInput = document.getElementById('scaleInput');
-const zoomInBtn = document.getElementById('zoomIn');
-const zoomOutBtn = document.getElementById('zoomOut');
-
-const img1 = document.getElementById('img1');
-const img2 = document.getElementById('img2');
-
-const canvas1 = document.getElementById('stringCanvas1');
-const canvas2 = document.getElementById('stringCanvas2');
-const ctx1 = canvas1.getContext('2d');
-const ctx2 = canvas2.getContext('2d');
-
-// ПЕРЕМЕННЫЕ ФИЗИКИ
-let frequency = 0;
-let waveSpeed = 0;
-let wavelength = 0;
-let amplitude = 8;
-let time = 0;
-let currentScale = 1;
-
-// ИСТОРИЯ ДЛЯ UNDO/REDO
-let history = [];
-let historyIndex = -1;
-const MAX_HISTORY = 5;
-
-// НАСТРОЙКА CANVAS
-function resizeCanvas(canvas, container) {
-  const rect = container.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
+:root {
+  --bg-main: #383737;
+  --bg-surface: #1E1E1E;
+  --bg-input: #0C0C0C;
+  --text-white: #E4E4E4;
+  --text-gray: #808080;
 }
 
-function updateCanvasSizes() {
-  resizeCanvas(canvas1, document.getElementById('imageBox1'));
-  resizeCanvas(canvas2, document.getElementById('imageBox2'));
+body {
+  background: #000;
+  font-family: 'Inter', Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-window.addEventListener('resize', updateCanvasSizes);
-updateCanvasSizes();
-
-// РАСЧЁТ ПАРАМЕТРОВ
-function calculate() {
-  const L = parseFloat(lengthInput.value);
-  const F = parseFloat(tensionInput.value);
-  const mu = parseFloat(densityInput.value);
-
-  if (!L || !F || !mu || L <= 0 || F <= 0 || mu <= 0) {
-    return;
-  }
-
-  waveSpeed = Math.sqrt(F / mu);
-  frequency = waveSpeed / (2 * L);
-  wavelength = waveSpeed / frequency;
-  
-  amplitude = Math.max(2, 12 / Math.sqrt(F));
-
-  frequencyOutput.textContent = `${frequency.toFixed(2)} Гц`;
-  speedOutput.textContent = `${waveSpeed.toFixed(2)} м/с`;
-  wavelengthOutput.textContent = `${wavelength.toFixed(4)} м`;
+.app-container {
+  width: 1082px;
+  height: 743px;
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-// ОБРАБОТЧИКИ ВВОДА
-lengthInput.addEventListener('input', () => {
-  saveToHistory();
-  calculate();
-});
-
-tensionInput.addEventListener('input', () => {
-  saveToHistory();
-  calculate();
-});
-
-densityInput.addEventListener('input', () => {
-  saveToHistory();
-  calculate();
-});
-
-diameterInput.addEventListener('input', () => {
-  saveToHistory();
-  calculate();
-});
-
-// КНОПКИ СТРЕЛОК
-document.querySelectorAll('.arrow-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const param = btn.dataset.param;
-    const dir = parseInt(btn.dataset.dir);
-    
-    let input, step;
-    
-    switch(param) {
-      case 'length':
-        input = lengthInput;
-        step = 0.01;
-        break;
-      case 'tension':
-        input = tensionInput;
-        step = 1;
-        break;
-      case 'density':
-        input = densityInput;
-        step = 0.0001;
-        break;
-      case 'diameter':
-        input = diameterInput;
-        step = 0.1;
-        break;
-    }
-    
-    if (input) {
-      let value = parseFloat(input.value);
-      value += step * dir;
-      value = Math.max(0.01, value);
-      
-      if (param === 'length') {
-        input.value = value.toFixed(2);
-      } else if (param === 'tension') {
-        input.value = value.toFixed(0);
-      } else if (param === 'density') {
-        input.value = value.toFixed(4);
-      } else if (param === 'diameter') {
-        input.value = value.toFixed(1);
-      }
-      
-      saveToHistory();
-      calculate();
-    }
-  });
-});
-
-// ИСТОРИЯ (UNDO/REDO)
-function saveToHistory() {
-  const state = {
-    L: lengthInput.value,
-    F: tensionInput.value,
-    mu: densityInput.value,
-    d: diameterInput.value
-  };
-  
-  history = history.slice(0, historyIndex + 1);
-  history.push(state);
-  
-  if (history.length > MAX_HISTORY) {
-    history.shift();
-  } else {
-    historyIndex++;
-  }
+.top-bar {
+  width: 100%;
+  height: 45px;
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 12px;
 }
 
-function undo() {
-  if (historyIndex > 0) {
-    historyIndex--;
-    const state = history[historyIndex];
-    lengthInput.value = state.L;
-    tensionInput.value = state.F;
-    densityInput.value = state.mu;
-    diameterInput.value = state.d;
-    calculate();
-  }
+.top-btn {
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 10px;
+  color: var(--text-white);
 }
 
-function redo() {
-  if (historyIndex < history.length - 1) {
-    historyIndex++;
-    const state = history[historyIndex];
-    lengthInput.value = state.L;
-    tensionInput.value = state.F;
-    densityInput.value = state.mu;
-    diameterInput.value = state.d;
-    calculate();
-  }
+.top-btn:hover {
+  background: #1A1A1A;
 }
 
-document.getElementById('prevStep').addEventListener('click', undo);
-document.getElementById('nextStep').addEventListener('click', redo);
-
-// МАСШТАБИРОВАНИЕ ИЗОБРАЖЕНИЙ
-function updateScale() {
-  let scale = parseInt(scaleInput.value) || 100;
-  scale = Math.max(10, Math.min(200, scale));
-  scaleInput.value = scale;
-  
-  currentScale = scale / 100;
-  
-  img1.style.transform = `scale(${currentScale})`;
-  img2.style.transform = `scale(${currentScale})`;
+.zoom-btns {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
 }
 
-scaleInput.addEventListener('input', updateScale);
-
-zoomInBtn.addEventListener('click', () => {
-  scaleInput.value = Math.min(200, parseInt(scaleInput.value) + 10);
-  updateScale();
-});
-
-zoomOutBtn.addEventListener('click', () => {
-  scaleInput.value = Math.max(10, parseInt(scaleInput.value) - 10);
-  updateScale();
-});
-
-// РИСОВАНИЕ СТРУНЫ 
-function drawString(ctx, canvas, stringConfig) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const baseWidth = canvas.width / currentScale;
-  const baseHeight = canvas.height / currentScale;
-  
-  const x = baseWidth * stringConfig.xRatio * currentScale;
-  const yStart = baseHeight * stringConfig.yStartRatio * currentScale;
-  const yEnd = baseHeight * stringConfig.yEndRatio * currentScale;
-  const stringLength = yEnd - yStart;
-  
-  const segments = Math.floor(100 * Math.sqrt(currentScale));
-  const scaledAmplitude = amplitude * currentScale;
-  const stringThickness = (parseFloat(diameterInput.value) || 1.5) * currentScale;
-  
-  // СТРУНА
-  ctx.strokeStyle = '#ffffffff';
-  ctx.lineWidth = stringThickness;
-  ctx.lineCap = 'round';
-  ctx.shadowBlur = 2 * currentScale;
-  ctx.shadowColor = 'rgba(173, 173, 173, 0.5)';
-  ctx.beginPath();
-
-  for (let i = 0; i <= segments; i++) {
-    const t = i / segments;
-    const y = yStart + stringLength * t;
-    
-    const displacement = scaledAmplitude * Math.sin(Math.PI * t) * Math.sin(2 * Math.PI * frequency * time);
-    const xPos = x + displacement;
-    
-    if (i === 0) {
-      ctx.moveTo(xPos, y);
-    } else {
-      ctx.lineTo(xPos, y);
-    }
-  }
-
-  ctx.stroke();
-  ctx.shadowBlur = 0;
+.zoom-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #111;
+  border: 1px solid #333;
+  color: var(--text-white);
+  font-size: 14px;
 }
 
-// КОНФИГУРАЦИЯ СТРУН 
-
-const stringConfig1 = {
-  xRatio: 0.38,      
-  yStartRatio: 0.05,
-  yEndRatio: 0.95
-};
-
-const stringConfig2 = {
-  xStartRatio: 0.33,  
-  xEndRatio: 0.37,    
-  yStartRatio: 0.12,
-  yEndRatio: 0.88
-};
-
-// АНИМАЦИЯ
-function animate(timestamp) {
-  time = timestamp / 1000;
-  
-  drawString(ctx1, canvas1, stringConfig1);
-  drawString(ctx2, canvas2, stringConfig2);
-  
-  requestAnimationFrame(animate);
+.zoom-btn:hover {
+  background: #222;
 }
 
-// ИНИЦИАЛИЗАЦИЯ
-saveToHistory();
-calculate();
-updateScale();
-requestAnimationFrame(animate);
+.main-area {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 390px 1fr 235px;
+  background: var(--bg-main);
+}
+
+.left-side {
+  background: var(--bg-main);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.scale-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2C2C2C;
+  border-radius: 16px;
+  padding: 6px 12px;
+  width: fit-content;
+}
+
+.scale-icon {
+  font-size: 14px;
+}
+
+.scale-input {
+  background: transparent;
+  color: var(--text-white);
+  font-size: 10px;
+  width: 40px;
+  text-align: right;
+}
+
+.scale-percent {
+  font-size: 10px;
+  color: var(--text-gray);
+}
+
+.image-box {
+  background: var(--bg-main);
+  overflow: hidden;
+  border-radius: 4px;
+  position: relative;
+}
+
+.img-1 {
+  height: 180px;
+}
+
+.img-2 {
+  height: 250px;
+}
+
+.image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform-origin: center center;
+  user-select: none;
+}
+
+.image-box canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.center-side {
+  background: var(--bg-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.main-image-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.main-image-box img {
+  width: 170%;
+  height: 170%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  transform: rotate(270deg);
+  margin-left: -12vw;
+  margin-top: -27vh;
+}
+
+.right-side {
+  background: var(--bg-surface);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.param-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.param-title {
+  background: #0C0C0C;
+  border-radius: 15px;
+  padding: 8px 12px;
+  font-size: 10px;
+  color: var(--text-white);
+  text-align: center;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.param-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 28px;
+  gap: 8px;
+  align-items: center;
+}
+
+.arrow-btn {
+  width: 28px;
+  height: 28px;
+  background: #0C0C0C;
+  border: 1px solid #000;
+  border-radius: 8px;
+  color: var(--text-white);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-btn:hover {
+  background: #1A1A1A;
+}
+
+.input-box {
+  background: #0C0C0C;
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+  position: relative;
+}
+
+.param-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-white);
+  font-size: 10px;
+  text-align: center;
+}
+
+.param-input:focus {
+  outline: none;
+}
+
+.param-block.readonly {
+  gap: 8px;
+}
+
+.output-box {
+  background: #0C0C0C;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 9px;
+  color: var(--text-gray);
+  text-align: center;
+}
