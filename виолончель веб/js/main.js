@@ -1,6 +1,4 @@
-// ==========================================
 // DOM ЭЛЕМЕНТЫ
-// ==========================================
 const lengthInput = document.getElementById('lengthInput');
 const tensionInput = document.getElementById('tensionInput');
 const densityInput = document.getElementById('densityInput');
@@ -22,9 +20,7 @@ const canvas2 = document.getElementById('stringCanvas2');
 const ctx1 = canvas1.getContext('2d');
 const ctx2 = canvas2.getContext('2d');
 
-// ==========================================
 // ПЕРЕМЕННЫЕ ФИЗИКИ
-// ==========================================
 let frequency = 0;
 let waveSpeed = 0;
 let wavelength = 0;
@@ -32,16 +28,12 @@ let amplitude = 8;
 let time = 0;
 let currentScale = 1;
 
-// ==========================================
 // ИСТОРИЯ ДЛЯ UNDO/REDO
-// ==========================================
 let history = [];
 let historyIndex = -1;
 const MAX_HISTORY = 5;
 
-// ==========================================
 // НАСТРОЙКА CANVAS
-// ==========================================
 function resizeCanvas(canvas, container) {
   const rect = container.getBoundingClientRect();
   canvas.width = rect.width;
@@ -56,9 +48,7 @@ function updateCanvasSizes() {
 window.addEventListener('resize', updateCanvasSizes);
 updateCanvasSizes();
 
-// ==========================================
 // РАСЧЁТ ПАРАМЕТРОВ
-// ==========================================
 function calculate() {
   const L = parseFloat(lengthInput.value);
   const F = parseFloat(tensionInput.value);
@@ -79,9 +69,7 @@ function calculate() {
   wavelengthOutput.textContent = `${wavelength.toFixed(4)} м`;
 }
 
-// ==========================================
 // ОБРАБОТЧИКИ ВВОДА
-// ==========================================
 lengthInput.addEventListener('input', () => {
   saveToHistory();
   calculate();
@@ -102,9 +90,7 @@ diameterInput.addEventListener('input', () => {
   calculate();
 });
 
-// ==========================================
 // КНОПКИ СТРЕЛОК
-// ==========================================
 document.querySelectorAll('.arrow-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const param = btn.dataset.param;
@@ -152,9 +138,7 @@ document.querySelectorAll('.arrow-btn').forEach(btn => {
   });
 });
 
-// ==========================================
 // ИСТОРИЯ (UNDO/REDO)
-// ==========================================
 function saveToHistory() {
   const state = {
     L: lengthInput.value,
@@ -200,9 +184,7 @@ function redo() {
 document.getElementById('prevStep').addEventListener('click', undo);
 document.getElementById('nextStep').addEventListener('click', redo);
 
-// ==========================================
 // МАСШТАБИРОВАНИЕ ИЗОБРАЖЕНИЙ
-// ==========================================
 function updateScale() {
   let scale = parseInt(scaleInput.value) || 100;
   scale = Math.max(10, Math.min(200, scale));
@@ -226,9 +208,7 @@ zoomOutBtn.addEventListener('click', () => {
   updateScale();
 });
 
-// ==========================================
-// РИСОВАНИЕ СТРУНЫ ТОЧНО ПОВЕРХ ФОТО
-// ==========================================
+// РИСОВАНИЕ СТРУНЫ 
 function drawString(ctx, canvas, stringConfig) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -244,12 +224,12 @@ function drawString(ctx, canvas, stringConfig) {
   const scaledAmplitude = amplitude * currentScale;
   const stringThickness = (parseFloat(diameterInput.value) || 1.5) * currentScale;
   
-  // ЖЁЛТАЯ СТРУНА
-  ctx.strokeStyle = '#D4AF37';
+  // СТРУНА
+  ctx.strokeStyle = '#ffffffff';
   ctx.lineWidth = stringThickness;
   ctx.lineCap = 'round';
   ctx.shadowBlur = 2 * currentScale;
-  ctx.shadowColor = 'rgba(212, 175, 55, 0.5)';
+  ctx.shadowColor = 'rgba(173, 173, 173, 0.5)';
   ctx.beginPath();
 
   for (let i = 0; i <= segments; i++) {
@@ -270,26 +250,22 @@ function drawString(ctx, canvas, stringConfig) {
   ctx.shadowBlur = 0;
 }
 
-// ==========================================
-// КОНФИГУРАЦИЯ СТРУН - ТОЧНО ПО ФОТО
-// ==========================================
+// КОНФИГУРАЦИЯ СТРУН 
 
 const stringConfig1 = {
-  xRatio: 0.38,      // ПЕРВОЕ ФОТО (верхнее) - струна ЛЕВЕЕ
+  xRatio: 0.38,      
   yStartRatio: 0.05,
   yEndRatio: 0.95
 };
 
 const stringConfig2 = {
-  xStartRatio: 0.33,  // ← УМЕНЬШИ (0.30, 0.28) чтобы верх был левее
-  xEndRatio: 0.37,    // ← УВЕЛИЧЬ (0.40, 0.42) чтобы низ был правее
+  xStartRatio: 0.33,  
+  xEndRatio: 0.37,    
   yStartRatio: 0.12,
   yEndRatio: 0.88
 };
 
-// ==========================================
 // АНИМАЦИЯ
-// ==========================================
 function animate(timestamp) {
   time = timestamp / 1000;
   
@@ -299,9 +275,7 @@ function animate(timestamp) {
   requestAnimationFrame(animate);
 }
 
-// ==========================================
 // ИНИЦИАЛИЗАЦИЯ
-// ==========================================
 saveToHistory();
 calculate();
 updateScale();
