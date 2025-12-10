@@ -179,11 +179,14 @@ body {
 }
 
 .main-image-box img {
-  width: 100%;
-  height: 100%;
+  width: 170%;
+  height: 170%;
   object-fit: contain;
   display: block;
   user-select: none;
+  transform: rotate(270deg);
+  margin-left: -12vw;
+  margin-top: -27vh;
 }
 
 /* ==========================================
