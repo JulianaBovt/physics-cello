@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Виолончель - Физика</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Верхняя панель -->
+    <div class="top-bar">
+      <button class="top-btn" id="prevStep">Предыдущий шаг</button>
+      <button class="top-btn" id="nextStep">Следующий шаг</button>
+      
+      <div class="zoom-btns">
+        <button class="zoom-btn" id="zoomIn">🔍+</button>
+        <button class="zoom-btn" id="zoomOut">🔍−</button>
+      </div>
+    </div>
+
+    <!-- Основная область -->
+    <div class="main-area">
+      
+      <!-- Левая панель -->
+      <div class="left-side">
+        <div class="scale-box">
+          <span class="scale-icon">🔍</span>
+          <input type="text" class="scale-input" id="scaleInput" value="100">
+          <span class="scale-percent">%</span>
+        </div>
+        
+        <div class="image-box img-1" id="imageBox1">
+          <img src="images/IMG_6312.PNG" alt="" id="img1">
+          <canvas id="stringCanvas1"></canvas>
+        </div>
+        
+        <div class="image-box img-2" id="imageBox2">
+          <img src="images/IMG_6311.PNG" alt="" id="img2">
+          <canvas id="stringCanvas2"></canvas>
+        </div>
+      </div>
+
+      <!-- Центр -->
+      <div class="center-side">
+        <div class="main-image-box">
+          <img src="images/IMG_6310.PNG" alt="" id="imgMain">
+        </div>
+      </div>
+
+      <!-- Правая панель -->
+      <div class="right-side">
+        
+        <!-- Длина струны (L) -->
+        <div class="param-block">
+          <div class="param-title">Длина струны (L)</div>
+          <div class="param-row">
+            <button class="arrow-btn left" data-param="length" data-dir="-1">◄</button>
+            <div class="input-box">
+              <input type="number" class="param-input" id="lengthInput" value="0.68" step="0.01">
+            </div>
+            <button class="arrow-btn right" data-param="length" data-dir="1">►</button>
+          </div>
+        </div>
+
+        <!-- Сила натяжения (F) -->
+        <div class="param-block">
+          <div class="param-title">Сила натяжения (F)</div>
+          <div class="param-row">
+            <button class="arrow-btn left" data-param="tension" data-dir="-1">◄</button>
+            <div class="input-box">
+              <input type="number" class="param-input" id="tensionInput" value="120" step="1">
+            </div>
+            <button class="arrow-btn right" data-param="tension" data-dir="1">►</button>
+          </div>
+        </div>
+
+        <!-- Линейная плотность (μ) -->
+        <div class="param-block">
+          <div class="param-title">Линейная плотность (μ)</div>
+          <div class="param-row">
+            <button class="arrow-btn left" data-param="density" data-dir="-1">◄</button>
+            <div class="input-box">
+              <input type="number" class="param-input" id="densityInput" value="0.0015" step="0.0001">
+            </div>
+            <button class="arrow-btn right" data-param="density" data-dir="1">►</button>
+          </div>
+        </div>
+
+        <!-- Диаметр струны (d) -->
+        <div class="param-block">
+          <div class="param-title">Диаметр струны (d)</div>
+          <div class="param-row">
+            <button class="arrow-btn left" data-param="diameter" data-dir="-1">◄</button>
+            <div class="input-box">
+              <input type="number" class="param-input" id="diameterInput" value="1.5" step="0.1">
+            </div>
+            <button class="arrow-btn right" data-param="diameter" data-dir="1">►</button>
+          </div>
+        </div>
+
+        <!-- Частота колебаний (f) - только чтение -->
+        <div class="param-block readonly">
+          <div class="param-title">Частоту колебаний (f)</div>
+          <div class="output-box" id="frequencyOutput">значение</div>
+        </div>
+
+        <!-- Скорость волны (v) - только чтение -->
+        <div class="param-block readonly">
+          <div class="param-title">Скорость волны в струне (v)</div>
+          <div class="output-box" id="speedOutput">значение</div>
+        </div>
+
+        <!-- Длина волны (λ) - только чтение -->
+        <div class="param-block readonly">
+          <div class="param-title">Длину волны (λ)</div>
+          <div class="output-box" id="wavelengthOutput">значение</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
